@@ -2,8 +2,9 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
   workflow_dispatch:
 
 permissions:
@@ -19,22 +20,33 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: List repository contents
+        run: |
+          pwd
+          ls -la
+          echo "Current directory contents:"
+          tree || ls -R
 
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.13'
+          python-version: '3.11'
           cache: 'pip'
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          pip list
 
       - name: Build static files
-        run: python scripts/build_static.py
+        run: |
+          python scripts/build_static.py
+          echo "Build directory contents:"
+          ls -la build/
 
       - name: Setup Pages
         uses: actions/configure-pages@v4

@@ -16,16 +16,19 @@ class RecipeVisualizer {
 
     async loadData() {
         try {
-            // Get base URL from base tag or default to ''
-            const baseTag = document.querySelector('base');
-            const basePath = baseTag ? baseTag.href : '';
+            // Check if we're running locally (development) or on GitHub Pages (production)
+            const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+            const url = isLocal ? '/api/recipes' : 'data/processed_ingredients.json';
             
-            const response = await fetch(`${basePath}data/processed_ingredients.json`);
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
             this.data = await response.json();
             this.renderCurrentView();
         } catch (error) {
             console.error('Error loading data:', error);
-            this.showError('Failed to load data');
+            this.showError('Failed to load data: ' + error.message);
         }
     }
 

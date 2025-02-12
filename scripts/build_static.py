@@ -25,8 +25,12 @@ def build_static():
         content = f.read()
     
     # Replace Flask url_for with static paths
-    content = content.replace("{{ url_for('static', filename='", '')
+    content = content.replace("{{ url_for('static', filename='", '/what-food/static/')
     content = content.replace("') }}", '')
+    
+    # Add base tag for GitHub Pages
+    content = content.replace('</head>',
+                            '<base href="/what-food/">\n</head>')
     
     # Write modified index.html
     with open(build_dir / 'index.html', 'w') as f:

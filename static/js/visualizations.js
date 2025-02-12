@@ -16,7 +16,11 @@ class RecipeVisualizer {
 
     async loadData() {
         try {
-            const response = await fetch('data/processed_ingredients.json');
+            // Get base URL from base tag or default to ''
+            const baseTag = document.querySelector('base');
+            const basePath = baseTag ? baseTag.href : '';
+            
+            const response = await fetch(`${basePath}data/processed_ingredients.json`);
             this.data = await response.json();
             this.renderCurrentView();
         } catch (error) {

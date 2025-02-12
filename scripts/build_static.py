@@ -22,9 +22,13 @@ def build_static():
     if not os.path.exists('data'):
         os.makedirs('data')
 
-    # Create or copy processed_ingredients.json
+    # Copy or create processed_ingredients.json
     source_data = Path('data/processed_ingredients.json')
-    if not source_data.exists():
+    if source_data.exists():
+        print("Using existing data file")
+        shutil.copy2(source_data, data_dir / 'processed_ingredients.json')
+    else:
+        print("Warning: No data file found. Creating sample data.")
         # Create sample data if it doesn't exist
         sample_data = {
             "ingredients": {
@@ -76,9 +80,7 @@ def build_static():
         }
         with open(source_data, 'w') as f:
             json.dump(sample_data, f, indent=2)
-
-    # Copy the data file
-    shutil.copy2(source_data, data_dir / 'processed_ingredients.json')
+        shutil.copy2(source_data, data_dir / 'processed_ingredients.json')
 
     # Create index.html with proper paths
     with open('templates/index.html', 'r') as f:

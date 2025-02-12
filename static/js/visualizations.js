@@ -57,6 +57,7 @@ class RecipeVisualizer {
             .data([
                 { value: 'categories', text: 'Ingredient Categories' },
                 { value: 'common', text: 'Most Common Ingredients' },
+                { value: 'heatmap', text: 'Ingredient Heatmap' },
                 { value: 'network', text: 'Recipe Connections' }
             ])
             .enter()
@@ -117,6 +118,9 @@ class RecipeVisualizer {
                 break;
             case 'common':
                 this.renderCommonIngredients();
+                break;
+            case 'heatmap':
+                this.renderIngredientHeatmap();
                 break;
             case 'network':
                 this.renderRecipeNetwork();
@@ -226,6 +230,279 @@ class RecipeVisualizer {
             .attr('y', chartHeight + 40)
             .attr('text-anchor', 'middle')
             .text('Number of Recipes');
+    }
+
+    renderIngredientHeatmap() {
+        // Adjust margins for rotated labels
+        const localMargin = {
+            top: config.margin.top,
+            right: config.margin.right,
+            bottom: config.margin.bottom + 60,  // More space for bottom labels
+            left: config.margin.left + 100      // More space for left labels
+        };
+
+        // Get top ingredients with their categories
+        const topIngredients = this.data.stats.most_common_ingredients
+            .slice(0, 15)  // Show top 15 ingredients
+            .map(d => ({
+                name: d.ingredient,
+                count: d.count,
+                categories: d.categories
+            }));
+
+        // Create relationship matrix based on shared categories and recipes
+        const matrix = [];
+        topIngredients.forEach((ing1, i) => {
+            matrix[i] = new Array(topIngredients.length).fill(0);
+            topIngredients.forEach((ing2, j) => {
+                if (i !== j) {
+                    // Calculate relationship score based on:
+                    // 1. Number of shared categories
+                    const sharedCategories = ing1.categories.filter(cat => 
+                        ing2.categories.includes(cat)).length;
+                    
+                    // 2. Co-occurrence in recipes
+                    const ing1Recipes = new Set(
+                        this.data.ingredients[ing1.name].recipes.map(r => r.title)
+                    );
+                    const ing2Recipes = new Set(
+                        this.data.ingredients[ing2.name].recipes.map(r => r.title)
+                    );
+                    const sharedRecipes = [...ing1Recipes].filter(recipe => 
+                        ing2Recipes.has(recipe)).length;
+                    
+                    // Combine scores (weighted average)
+                    matrix[i][j] = (sharedCategories * 2 + sharedRecipes) / 3;
+                }
+            });
+        });
+
+        // Update title
+        d3.select('.chart-title').text('Ingredient Relationships Heatmap');
+
+        // Set up scales with adjusted dimensions
+        const chartWidth = config.width - localMargin.left - localMargin.right;
+        const chartHeight = config.height - localMargin.top - localMargin.bottom;
+
+        const x = d3.scaleBand()
+            .domain(topIngredients.map(d => d.name))
+            .range([0, chartWidth])
+            .padding(0.1);
+
+        const y = d3.scaleBand()
+            .domain(topIngredients.map(d => d.name))
+            .range([0, chartHeight])
+            .padding(0.1);
+
+        // Create color scale
+        const color = d3.scaleSequential()
+            .interpolator(d3.interpolateYlOrRd)
+            .domain([0, d3.max(matrix, row => d3.max(row))]);
+
+        // Add cells
+        const cells = this.chart.selectAll('.heatmap-cell')
+            .data(matrix.flatMap((row, i) => 
+                row.map((value, j) => ({
+                    value,
+                    ing1: topIngredients[i],
+                    ing2: topIngredients[j]
+                }))
+            ))
+            .enter()
+            .append('rect')
+            .attr('class', 'heatmap-cell')
+            .attr('x', d => x(d.ing2.name))
+            .attr('y', d => y(d.ing1.name))
+            .attr('width', x.bandwidth())
+            .attr('height', y.bandwidth())
+            .style('fill', d => color(d.value));
+
+        // Add tooltip interaction
+        cells.on('mouseover', (event, d) => {
+            // Debug logging
+            console.log('Hovering over cell:', d);
+            console.log('Ingredient 1:', d.ing1);
+            console.log('Ingredient 2:', d.ing2);
+            console.log('Mouse position:', { x: event.clientX, y: event.clientY });
+
+            // Remove any existing tooltips
+            d3.selectAll('.tooltip').remove();
+
+            const tooltip = d3.select('body')  // Attach to body instead of #main-viz
+                .append('div')
+                .attr('class', 'tooltip')
+                .style('position', 'fixed')  // Use fixed positioning
+                .style('left', (event.clientX + 10) + 'px')
+                .style('top', (event.clientY + 10) + 'px')
+                .style('background', 'white')
+                .style('padding', '12px')
+                .style('border', '2px solid #ff0000')  // Red border for debugging
+                .style('border-radius', '4px')
+                .style('pointer-events', 'none')
+                .style('font-size', '12px')
+                .style('z-index', '9999')
+                .style('box-shadow', '0 2px 4px rgba(0,0,0,0.1)')
+                .style('max-width', '300px')
+                .style('display', 'block')
+                .style('opacity', '1');
+
+            const sharedCategories = d.ing1.categories.filter(cat => 
+                d.ing2.categories.includes(cat));
+
+            const ing1Data = this.data.ingredients[d.ing1.name];
+            const ing2Data = this.data.ingredients[d.ing2.name];
+
+            // Safely get recipes
+            const ing1Recipes = ing1Data ? new Set(ing1Data.recipes.map(r => r.title)) : new Set();
+            const ing2Recipes = ing2Data ? new Set(ing2Data.recipes.map(r => r.title)) : new Set();
+            const sharedRecipes = [...ing1Recipes].filter(recipe => ing2Recipes.has(recipe));
+
+            // Get the most common units for each ingredient (with safety checks)
+            const getTopUnits = (ingData) => {
+                if (!ingData || !ingData.common_units) return [];
+                return Object.entries(ingData.common_units || {})
+                    .sort((a, b) => b[1] - a[1])
+                    .slice(0, 2)
+                    .map(([unit, count]) => `${unit} (${count}x)`);
+            };
+
+            // Format the tooltip content with more details
+            let tooltipContent = `
+                <div class="tooltip-content">
+                    <div class="tooltip-header">
+                        <strong>${d.ing1.name}</strong> + <strong>${d.ing2.name}</strong>
+                    </div>
+                    <div class="tooltip-body">
+                        <div class="tooltip-section">
+                            <span class="tooltip-label">Relationship Score:</span> 
+                            ${d.value.toFixed(2)}
+                        </div>
+                        <div class="tooltip-section">
+                            <span class="tooltip-label">Individual Counts:</span><br>
+                            • ${d.ing1.name}: ${d.ing1.count} recipes<br>
+                            • ${d.ing2.name}: ${d.ing2.count} recipes
+                        </div>
+                        ${sharedCategories.length ? `
+                        <div class="tooltip-section">
+                            <span class="tooltip-label">Shared Categories:</span><br>
+                            ${sharedCategories.map(cat => `• ${cat}`).join('<br>')}
+                        </div>
+                        ` : ''}
+                        ${sharedRecipes.length ? `
+                        <div class="tooltip-section">
+                            <span class="tooltip-label">Co-occur in ${sharedRecipes.length} recipes:</span><br>
+                            ${sharedRecipes.slice(0, 3).map(recipe => `• ${recipe}`).join('<br>')}
+                            ${sharedRecipes.length > 3 ? '<br>• ...' : ''}
+                        </div>
+                        ` : ''}
+                        <div class="tooltip-section">
+                            <span class="tooltip-label">Common Units:</span><br>
+                            • ${d.ing1.name}: ${getTopUnits(ing1Data).join(', ') || 'N/A'}<br>
+                            • ${d.ing2.name}: ${getTopUnits(ing2Data).join(', ') || 'N/A'}
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            tooltip.html(tooltipContent);
+
+            // Adjust position if tooltip would go off screen
+            const tooltipNode = tooltip.node();
+            const tooltipRect = tooltipNode.getBoundingClientRect();
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+
+            let left = event.clientX + 10;
+            let top = event.clientY + 10;
+
+            if (left + tooltipRect.width > viewportWidth) {
+                left = event.clientX - tooltipRect.width - 10;
+            }
+            if (top + tooltipRect.height > viewportHeight) {
+                top = event.clientY - tooltipRect.height - 10;
+            }
+
+            tooltip
+                .style('left', left + 'px')
+                .style('top', top + 'px');
+
+            console.log('Tooltip dimensions:', {
+                width: tooltipRect.width,
+                height: tooltipRect.height,
+                left: left,
+                top: top
+            });
+        })
+        .on('mouseout', () => {
+            d3.selectAll('.tooltip').remove();
+        });
+
+        // Add axes with improved labels
+        // Bottom axis
+        this.chart.append('g')
+            .attr('transform', `translate(0,${chartHeight})`)
+            .call(d3.axisBottom(x))
+            .selectAll('text')
+            .attr('transform', 'rotate(-45)')
+            .style('text-anchor', 'end')
+            .style('font-size', '10px')
+            .attr('dx', '-0.8em')
+            .attr('dy', '0.8em');
+
+        // Left axis
+        this.chart.append('g')
+            .call(d3.axisLeft(y))
+            .selectAll('text')
+            .style('text-anchor', 'end')
+            .style('font-size', '10px')
+            .attr('dx', '-0.5em')
+            .attr('dy', '-0.5em')
+            .attr('transform', 'rotate(-45)');
+
+        // Update chart position to accommodate new margins
+        this.chart.attr('transform', `translate(${localMargin.left},${localMargin.top})`);
+
+        // Add legend
+        const legendWidth = 100;
+        const legendHeight = 20;
+        const legendScale = d3.scaleLinear()
+            .domain(color.domain())
+            .range([0, legendWidth]);
+
+        const legend = this.svg.append('g')
+            .attr('class', 'legend')
+            .attr('transform', `translate(${config.width - legendWidth - 20}, 20)`);
+
+        const legendGradient = legend.append('defs')
+            .append('linearGradient')
+            .attr('id', 'legend-gradient')
+            .attr('x1', '0%')
+            .attr('x2', '100%')
+            .attr('y1', '0%')
+            .attr('y2', '0%');
+
+        legendGradient.selectAll('stop')
+            .data(d3.ticks(0, d3.max(matrix, row => d3.max(row)), 10))
+            .enter()
+            .append('stop')
+            .attr('offset', d => (d / d3.max(matrix, row => d3.max(row)) * 100) + '%')
+            .attr('stop-color', d => color(d));
+
+        legend.append('rect')
+            .attr('width', legendWidth)
+            .attr('height', legendHeight)
+            .style('fill', 'url(#legend-gradient)');
+
+        legend.append('text')
+            .attr('x', 0)
+            .attr('y', legendHeight + 15)
+            .text('Low Relationship');
+
+        legend.append('text')
+            .attr('x', legendWidth)
+            .attr('y', legendHeight + 15)
+            .attr('text-anchor', 'end')
+            .text('High Relationship');
     }
 
     renderRecipeNetwork() {

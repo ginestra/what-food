@@ -104,44 +104,68 @@ if __name__ == "__main__":
         "Italian": [
             "https://www.bbcgoodfood.com/recipes/classic-lasagne-0",
             "https://www.bbcgoodfood.com/recipes/pizza-margherita-4-easy-steps",
-            "https://www.bbcgoodfood.com/recipes/proper-spaghetti-meatballs"
+            "https://www.bbcgoodfood.com/recipes/proper-spaghetti-meatballs",
+            "https://www.bbcgoodfood.com/recipes/next-level-tiramisu",
+            "https://www.bbcgoodfood.com/recipes/classic-pesto",
+            "https://www.bbcgoodfood.com/recipes/risotto-primavera"
         ],
         "Asian": [
             "https://www.bbcgoodfood.com/recipes/chicken-chow-mein",
             "https://www.bbcgoodfood.com/recipes/easy-teriyaki-chicken",
             "https://www.bbcgoodfood.com/recipes/thai-green-curry",
-            "https://www.bbcgoodfood.com/recipes/next-level-fried-rice"
+            "https://www.bbcgoodfood.com/recipes/next-level-fried-rice",
+            "https://www.bbcgoodfood.com/recipes/pad-thai",
+            "https://www.bbcgoodfood.com/recipes/chicken-satay",
+            "https://www.bbcgoodfood.com/recipes/beef-rendang"
         ],
         "Mediterranean": [
             "https://www.bbcgoodfood.com/recipes/greek-salad",
             "https://www.bbcgoodfood.com/recipes/authentic-falafels",
-            "https://www.bbcgoodfood.com/recipes/grilled-aubergine-tabbouleh"
+            "https://www.bbcgoodfood.com/recipes/grilled-aubergine-tabbouleh",
+            "https://www.bbcgoodfood.com/recipes/moussaka",
+            "https://www.bbcgoodfood.com/recipes/paella",
+            "https://www.bbcgoodfood.com/recipes/hummus"
         ],
         "Mexican": [
             "https://www.bbcgoodfood.com/recipes/chilli-con-carne-recipe",
             "https://www.bbcgoodfood.com/recipes/easy-guacamole",
-            "https://www.bbcgoodfood.com/recipes/black-bean-tacos"
+            "https://www.bbcgoodfood.com/recipes/black-bean-tacos",
+            "https://www.bbcgoodfood.com/recipes/enchiladas",
+            "https://www.bbcgoodfood.com/recipes/mexican-rice",
+            "https://www.bbcgoodfood.com/recipes/chicken-fajitas"
         ],
         "Breakfast": [
             "https://www.bbcgoodfood.com/recipes/perfect-pancakes-recipe",
             "https://www.bbcgoodfood.com/recipes/best-scrambled-eggs-recipe",
-            "https://www.bbcgoodfood.com/recipes/overnight-oats"
+            "https://www.bbcgoodfood.com/recipes/overnight-oats",
+            "https://www.bbcgoodfood.com/recipes/french-toast",
+            "https://www.bbcgoodfood.com/recipes/granola",
+            "https://www.bbcgoodfood.com/recipes/eggs-benedict"
         ],
         "Healthy": [
             "https://www.bbcgoodfood.com/recipes/quinoa-feta-salad",
             "https://www.bbcgoodfood.com/recipes/chicken-satay-salad",
-            "https://www.bbcgoodfood.com/recipes/moroccan-chickpea-soup"
+            "https://www.bbcgoodfood.com/recipes/moroccan-chickpea-soup",
+            "https://www.bbcgoodfood.com/recipes/buddha-bowl",
+            "https://www.bbcgoodfood.com/recipes/lentil-soup",
+            "https://www.bbcgoodfood.com/recipes/sweet-potato-curry"
         ],
         "Vegetarian": [
             "https://www.bbcgoodfood.com/recipes/spinach-sweet-potato-lentil-dhal",
             "https://www.bbcgoodfood.com/recipes/veggie-fajitas",
-            "https://www.bbcgoodfood.com/recipes/roasted-vegetable-lasagne"
+            "https://www.bbcgoodfood.com/recipes/roasted-vegetable-lasagne",
+            "https://www.bbcgoodfood.com/recipes/mushroom-risotto",
+            "https://www.bbcgoodfood.com/recipes/vegetable-curry",
+            "https://www.bbcgoodfood.com/recipes/cauliflower-cheese"
         ],
         "Desserts": [
             "https://www.bbcgoodfood.com/recipes/next-level-tiramisu",
             "https://www.bbcgoodfood.com/recipes/best-ever-chocolate-brownies-recipe",
             "https://www.bbcgoodfood.com/recipes/classic-chocolate-mousse",
-            "https://www.bbcgoodfood.com/recipes/lemon-drizzle-cake"
+            "https://www.bbcgoodfood.com/recipes/lemon-drizzle-cake",
+            "https://www.bbcgoodfood.com/recipes/apple-crumble",
+            "https://www.bbcgoodfood.com/recipes/sticky-toffee-pudding",
+            "https://www.bbcgoodfood.com/recipes/carrot-cake"
         ]
     }
     

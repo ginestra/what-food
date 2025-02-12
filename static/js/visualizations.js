@@ -16,12 +16,12 @@ class RecipeVisualizer {
 
     async loadData() {
         try {
-            const response = await fetch('/api/recipes');
+            const response = await fetch('data/processed_ingredients.json');
             this.data = await response.json();
             this.renderCurrentView();
         } catch (error) {
             console.error('Error loading data:', error);
-            this.showError('Failed to load recipe data');
+            this.showError('Failed to load data');
         }
     }
 

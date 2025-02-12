@@ -1,0 +1,202 @@
+/* Custom variables to complement Bootstrap */
+:root {
+    --primary-color: #2c3e50;
+    --secondary-color: #3498db;
+    --background-color: #f5f6fa;
+    --text-color: #2c3e50;
+    --spacing-unit: 1rem;
+    --border-radius: 8px;
+    --shadow: 0 2px 4px rgba(0,0,0,0.1);
+    --viz-height: 600px;
+}
+
+/* Reset and base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    line-height: 1.6;
+    color: var(--text-color);
+    background-color: var(--background-color);
+}
+
+/* Layout */
+header {
+    background-color: var(--primary-color);
+    color: white;
+    padding: calc(var(--spacing-unit) * 2);
+    text-align: center;
+    box-shadow: var(--shadow);
+}
+
+header p {
+    margin-top: var(--spacing-unit);
+    opacity: 0.9;
+}
+
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: calc(var(--spacing-unit) * 2);
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    grid-template-areas: 
+        "controls visualization"
+        "details details";
+    gap: calc(var(--spacing-unit) * 2);
+}
+
+/* Components */
+.controls {
+    grid-area: controls;
+    background: white;
+    padding: var(--spacing-unit);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+}
+
+.view-controls {
+    margin-bottom: var(--spacing-unit);
+}
+
+.view-controls h3 {
+    margin-bottom: calc(var(--spacing-unit) * 0.5);
+    color: var(--primary-color);
+}
+
+.view-controls select {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    font-size: 1rem;
+}
+
+.visualization {
+    grid-area: visualization;
+    background: white;
+    padding: var(--spacing-unit);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+}
+
+#main-viz {
+    width: 100%;
+    height: var(--viz-height);
+    position: relative;
+}
+
+.details {
+    grid-area: details;
+    background: white;
+    padding: var(--spacing-unit);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+}
+
+#recipe-details {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+#recipe-details h2 {
+    color: var(--primary-color);
+    margin-bottom: var(--spacing-unit);
+}
+
+#recipe-details ul {
+    margin: var(--spacing-unit) 0;
+    padding-left: calc(var(--spacing-unit) * 2);
+}
+
+/* Visualization specific styles */
+.bar {
+    transition: opacity 0.2s;
+}
+
+.bar:hover {
+    opacity: 0.8;
+    cursor: pointer;
+}
+
+.chart-title {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+/* Network visualization */
+.node {
+    cursor: pointer;
+}
+
+.node:hover {
+    opacity: 0.8;
+}
+
+.link {
+    stroke: #999;
+    stroke-opacity: 0.6;
+}
+
+/* Custom form styling */
+.view-controls select {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    font-size: 1rem;
+}
+
+/* Error messages */
+.error-message {
+    color: var(--bs-danger);
+    text-align: center;
+}
+
+/* Loading indicator */
+.loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: var(--viz-height);
+}
+
+/* Legend styles */
+.legend-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.legend-color {
+    width: 1rem;
+    height: 1rem;
+    margin-right: 0.5rem;
+    border-radius: 0.25rem;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    main {
+        grid-template-columns: 1fr;
+        grid-template-areas: 
+            "controls"
+            "visualization"
+            "details";
+    }
+    
+    .controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--spacing-unit);
+    }
+    
+    .view-controls {
+        flex: 1;
+        min-width: 200px;
+    }
+} 

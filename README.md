@@ -2,6 +2,8 @@
 
 An interactive dashboard for visualizing ingredients and patterns from food recipes.
 
+https://ginestra.github.io/what-food/
+
 ## Features
 - Recipe scraping from supported websites
 - Ingredient analysis and categorization
